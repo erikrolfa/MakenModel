@@ -1,0 +1,220 @@
+<!-- create_account.html -->
+
+{% extends "base.html" %}
+
+{% block body_class %}single-dark-background{% endblock %}
+
+{% set limited_nav = True %}
+
+{% block content %}
+    <!-- Create Account Box -->
+
+    <div class="container d-flex justify-content-center">
+        <div class="bg-white w-50 rounded">
+            <div class="container">
+                <div class="text-center">
+
+                        <!-- TODO: Fix form action -->
+                    <form action="{{ url_for('create_account') }}" method='post' enctype='multipart/form-data' class="needs-validation" novalidate>
+                        <div class="m-3"><p class="text-dark fw-medium fs-2">Create Account</p></div>
+                        <div class="mb-4">
+                            <div class="text-start fs-5">
+                                <label for="username" class="form-label">Create a username</label>
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+                                <input name='username' type="text" class="form-control" id="username" placeholder="Username" required autofocus>
+
+                                <div class="invalid-feedback">
+                                    Please enter a username
+                                </div>
+
+                            </div>
+                            <!-- If user enters a username that has already been taken -->
+                            {% if username_error %}
+                                <div class="alert alert-warning mt-2" role="alert">
+                                    {{ username_error }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-4">
+                            <div class="text-start">
+                                <label for="email_input_form" class="form-label fs-5">
+                                    Enter your email address
+                                </label>
+                                <br>
+                                <small class="text-muted">
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-warning">ONLY</span> used to reset your username/password if forgotten
+                                </small>
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>
+                            <input name='email' type="email" class="form-control" id="email_input_form" placeholder="example@email.com" required>
+                            <div class="invalid-feedback">
+                                Invalid Email Address
+                            </div>
+
+                            </div>
+                            <!-- If user enters email that already has an account -->
+                            {% if email_error %}
+                                <div class="alert alert-warning mt-2" role="alert">
+                                    {{ email_error }}
+                                </div>
+                            {% endif %}
+
+                        </div>
+                        <div class="mb-4">
+                            <div class="text-start">
+                                <label for="password_input_form" class="form-label fs-5">
+                                    Create a password
+                                </label>
+                                <small class="text-muted">
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<ul>
+                                        <li id="length_criteria">Between 6-20 characters</li>
+                                        <li id="upper_criteria">Contains at least 1 capital letter</li>
+                                        <li id="lower_criteria">Contains at least 1 lowercase letter</li>
+                                        <li id="special_criteria">Contains at least 1 special charater</li>
+                                    </ul>
+                                </small>
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-unlock-fill"></i></span>
+                                <input name='password' type="password" class="form-control" id="password_input_form" placeholder="Password" required autocomplete="new-password">
+                                <div class="invalid-feedback">
+                                    Invalid Password
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <div class="text-start">
+                                <label for="reenter_password" class="form-label fs-5">
+                                    Re-Enter Password
+                                </label>
+                                <small class="text-muted">
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<ul>
+                                        <li id="match_criteria">Passwords match</li>
+                                    </ul>
+                                </small>
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                            <input name='verify_password' type="password" class="form-control" id="reenter_password" placeholder="Re-Enter Passord" required autocomplete="new-password">
+                            <div class="invalid-feedback">
+                                Passwords do not match
+                            </div>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <div class="text-start">
+                                <label for="upload_photo" class="form-label fs-5">
+                                    Upload a photo for your profile
+                                    <span class="text-muted">(optional)</span>
+                                </label>
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-file-image-fill"></i></span>
+                                <input name='profile_pic_filename' type="file" class="form-control" id="formFile" placeholder="Upload Profile Picture">
+                            </div>
+                        </div>
+                        <div class="m-3">
+                            <!-- TODO: Button should make post to create account route -->
+                            <button class="btn btn-dark col-12" type="submit">Create Account</a>
+                        </div>
+                    </form>
+
+                    <!-- TODO: Button should redirect to create account page -->
+                    <!-- REVIEW: Should link color be changed since yellow isn't super visibile? -->
+                    <p class="text-dark">Already have an account? <a href="{{ url_for('show_login') }}" class="link-warning">Login</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block custom_scripts %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var forms = document.querySelectorAll( ".needs-validation" );
+
+            Array.prototype.slice.call( forms ).forEach( function( form )
+            {
+                form.addEventListener( "submit", function( event )
+                {
+                    if ( !form.checkValidity( ) || !validatePassword() || !validatePasswordMatch() )
+                    {
+                        event.preventDefault( );
+                        event.stopPropagation( );
+                    }
+                    form.classList.add( "was-validated" );
+                }, false );
+            } );
+
+            function validatePassword() {
+                var password = document.getElementById("password_input_form").value;
+                var lengthCriteria = document.getElementById("length_criteria");
+                var upperCriteria = document.getElementById("upper_criteria");
+                var lowerCriteria = document.getElementById("lower_criteria");
+                var specialCriteria = document.getElementById("special_criteria");
+
+                // Reset classes
+                lengthCriteria.classList.remove("text-success");
+                upperCriteria.classList.remove("text-success");
+                lowerCriteria.classList.remove("text-success");
+                specialCriteria.classList.remove("text-success");
+
+                // Between 6-20 characters
+                var lengthValid = password.length >= 6 && password.length <= 20;
+
+                // Contains at least 1 uppercase letter
+                var upperCaseValid = /[A-Z]/.test(password);
+
+                // Contains at least 1 lowercase letter
+                var lowerCaseValid = /[a-z]/.test(password);
+
+                // Contains at least 1 special character
+                var specialCharacterValid = /[!@#$%^&*]/.test(password);
+
+                updateCriteria(lengthCriteria, lengthValid);
+                updateCriteria(upperCriteria, upperCaseValid);
+                updateCriteria(lowerCriteria, lowerCaseValid);
+                updateCriteria(specialCriteria, specialCharacterValid);
+
+                // Final combined validation check
+                var isValidPassword = lengthValid && upperCaseValid && lowerCaseValid && specialCharacterValid;
+                document.getElementById("password_input_form").setCustomValidity(isValidPassword ? "" : "Invalid password format");
+
+                return isValidPassword;
+            }
+
+            function validatePasswordMatch() {
+                var original_pass = document.getElementById("password_input_form").value;
+                var reenter_password = document.getElementById("reenter_password").value;
+                var matchCriteria = document.getElementById("match_criteria");
+
+                var doPasswordsMatch = original_pass == reenter_password;
+
+                updateCriteria(matchCriteria, doPasswordsMatch);
+
+                document.getElementById("reenter_password").setCustomValidity(doPasswordsMatch ? "" : "Passwords do not match");
+
+                return doPasswordsMatch
+            }
+
+            const passwordInput = document.getElementById("password_input_form");
+            passwordInput.addEventListener("input", validatePassword);
+
+            const matchInput = document.getElementById("reenter_password");
+            matchInput.addEventListener("input", validatePasswordMatch);
+
+            function updateCriteria(criteriaElement, isValid) {
+                if(isValid) {
+                    criteriaElement.classList.remove("text-danger");
+                    criteriaElement.classList.add("text-success");
+                } else {
+                    criteriaElement.classList.remove("text-success");
+                    criteriaElement.classList.add("text-danger");
+                }
+            }
+        });
+    </script>
+{% endblock %}

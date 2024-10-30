@@ -1,0 +1,148 @@
+<!-- add_paints.html -->
+
+{% extends 'base.html' %}
+
+{% set full_nav = True %}
+
+{% block body_class %}single-dark-background{% endblock %}
+
+{% block content %}
+
+<!-- Toolbox Navigation Bar -->
+
+<div class="container text-center">
+    <h1 class="text-light">Toolbox</h1>
+    <nav class='d-flex justify-content-center mt-3' aria-label="...">
+        <ul class="pagination">
+            <li class="page-item active"><a href="{{ url_for('show_add_paints') }}" class="page-link px-5 text-dark">Add Paints</a></li>
+            <li class="page-item"><a href="{{ url_for('show_toolbox') }}" class="page-link px-5 text-dark">Overview</a></li>
+            <li class="page-item"><a href="{{ url_for('show_your_paints') }}" class="page-link px-5 text-dark">Your Paints</a></li>
+        </ul>
+    </nav>
+</div>
+
+<div class="container text-center w-50">
+  <div class="bg-white rounded">
+    <div class="container">
+      <form action="{{ url_for('add_paints') }}" method='post' enctype='multipart/form-data'>
+        <div class="form-group mb-3">
+          <label for="brand" class="m-2">Brand:</label>
+          <input type="text" class="form-control" id="brand" autocomplete="off" name='brand' placeholder="Brand"
+            value="{{ brand if brand else '' }}" required>
+        </div>
+        <div class="form-group mb-3">
+          <label for="paintName" class="mb-2">Paint Name or Paint Code:</label>
+          <input type="text" class="form-control" id="paintName" autocomplete="off" name='paint'
+            placeholder="Paint Name or Paint Code" required>
+        </div>
+        <button type="submit" class="btn btn-primary mb-3">Add to Collection</button>
+      </form>
+    </div>
+  </div>
+
+  {% if success_message %}
+    <div class="alert alert-success mt-3" role="alert">
+        {{ success_message }}
+    </div>
+  {% elif repeat_color %}
+    <div class="alert alert-warning mt-3" role="alert">
+      {{ repeat_color }}
+    </div>
+  {% endif %}
+</div>
+
+
+{% endblock %}
+
+
+{% block custom_scripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<style>
+    /* Style for the autocomplete dropdown */
+    .ui-autocomplete {
+      background-color: white; /* Light background for dropdown items */
+      border: 1px solid #aaa; /* Light grey border */
+      max-height: 150px;
+      overflow-y: auto; /* Enable vertical scroll if necessary */
+      overflow-x: hidden; /* Hide horizontal scroll */
+      padding: 5px 0; /* Padding to make it look better */
+      border-radius: 4px; /* Rounded corners */
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Subtle shadow for depth */
+    }
+
+    .ui-autocomplete .ui-menu-item-wrapper {
+        padding: 8px 20px; /* Pad menu items for better readability */
+        cursor: pointer; /* Change the cursor to indicate interactivity */
+    }
+
+    /* Style for the active/hover state of dropdown items */
+    .ui-menu-item-wrapper.ui-state-active {
+      background: #efefef; /* Light grey background for active item */
+    }
+</style>
+
+<script>
+$(document).ready(function(){
+  // Autocomplete for brand names
+  $("#brand").autocomplete({
+    source: function(request, response) {
+      $.ajax({
+        url: '/api/brands',
+        method: 'GET',
+        data: {
+            term: request.term
+        },
+        success: function(data) {
+          response(data);
+        }
+      });
+    },
+    minLength: 1, // Minimum characters before triggering autocomplete,
+    classes: {
+      "ui-autocomplete": "highlight"
+    }
+  });
+
+  $("#paintName").autocomplete({
+    source: function(request, response) {
+        var brand = $('#brand').val();
+        var searchTerm = request.term;
+
+        var isExactMatch = searchTerm.endsWith(' ');
+
+        searchTerm = searchTerm.trim();
+
+        $.ajax({
+            url: '/api/paints/',
+            method: 'GET',
+            data: {
+                brand: brand,
+                term: searchTerm,
+                exactMatch: isExactMatch
+            },
+            success: function(data) {
+                console.log("data recieved:", data);
+                var formattedData = $.map(data, function(item) {
+                    var label = "(" + item.paint_code + ") " + item.paint_name + " (" + item.paint_type + ")";
+                    return {
+                        label: label,
+                        value: label
+                    };
+                });
+                response(formattedData);
+            }
+        });
+    },
+    minLength: 1,
+    classes: {
+        "ui-autocomplete": "highlight"
+        }
+    });
+});
+
+
+
+</script>
+
+{% endblock %}

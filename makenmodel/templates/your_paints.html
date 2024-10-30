@@ -1,0 +1,82 @@
+<!-- add_paints.html -->
+
+{% extends 'base.html' %}
+
+{% set full_nav = True %}
+
+{% block body_class %}single-dark-background{% endblock %}
+
+{% block content %}
+
+<!-- Toolbox Navigation Bar -->
+
+<div class="container text-center">
+    <h1 class="text-light">Toolbox</h1>
+    <nav class='d-flex justify-content-center mt-3' aria-label="...">
+        <ul class="pagination">
+            <li class="page-item"><a href="{{ url_for('show_add_paints') }}" class="page-link px-5 text-dark">Add Paints</a></li>
+            <li class="page-item"><a href="{{ url_for('show_toolbox') }}" class="page-link px-5 text-dark">Overview</a></li>
+            <li class="page-item active"><a href="{{ url_for('show_your_paints') }}" class="page-link px-5 text-dark">Your Paints</a></li>
+        </ul>
+    </nav>
+</div>
+<div class="container">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col" class="text-center">Brand</th>
+                <th scope="col" class="text-center">Code</th>
+                <th scope="col" class="text-center">Color</th>
+                <th scope="col" class="text-center">Background Color</th>
+                <th scope="col" class="text-center">Shine Type</th>
+                <th scope="col" class="text-center">Paint Type</th>
+                <th scope="col" class="text-center">Getting Low?</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for paint_info in paint_details %}
+                <tr>
+                    <td class="text-center">{{ paint_info['brand'] }}</td>
+                    <td class="text-center">{{ paint_info['paint_code'] }}</td>
+                    <td class="text-center">{{ paint_info['paint_name'] }}</td>
+                    <td class="text-center">{{ paint_info['background_color'] }}</td>
+                    <td class="text-center">{{ paint_info['shine_type'] }}</td>
+                    <td class="text-center">{{ paint_info['paint_type'] }}</td>
+                    <td class="text-center">
+                        <input type="checkbox" name="getting_low_checkbox" id="checkbox-{{ paint_info['paint_code'] }}" class="getting-low-checkbox" data-id="{{ paint_info['unique_paint_identifier'] }}" {% if paint_info['need_restock'] %}checked{% endif %}>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
+
+{% block custom_scripts %}
+
+<script>
+    $(document).ready(function() {
+        $('.getting-low-checkbox').change(function() {
+            let paintId = $(this).data('id');
+            let isGettingLow = $(this).is(':checked');
+
+            $.ajax({
+                url: '/toolbox/getting_low', // The URL to your Flask route
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    id: paintId,
+                    getting_low: isGettingLow
+                }),
+                dataType: 'json',
+                success: function(response) {
+                    console.log(response); // Handle success
+                },
+            });
+        });
+    });
+</script>
+
+
+{% endblock %}

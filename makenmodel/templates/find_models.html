@@ -1,0 +1,177 @@
+<!-- Models.html -->
+
+{% extends 'base.html' %}
+
+{% set full_nav = True %}
+
+{% block body_class %}single-dark-background{% endblock %}
+
+{% block content %}
+<div class="container px-4 text-center bg-white rounded">
+
+    <!-- Legend for difficulty rating -->
+    <div class="text-center py-2">
+        <div class="d-flex justify-content-center align-items-center">
+            <div class="mx-2">
+                <span class="border border-5 border-success" style="padding:0.5rem; display: inline-block;"></span> <span>Easy (Green)</span>
+            </div>
+            <div class="mx-2">
+                <span class="border border-5 border-warning" style="padding:0.5rem; display: inline-block;"></span> <span>Medium (Yellow)</span>
+            </div>
+            <div class="mx-2">
+                <span class="border border-5 border-danger" style="padding:0.5rem; display: inline-block;"></span> <span>Hard (Red)</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Start of Accordion Component -->
+    <div class="accordion py-5" id="modelsAccordion">
+
+        <!-- Exact Matches Accordion Item -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingExactMatches">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExactMatches" aria-expanded="false" aria-controls="collapseExactMatches">
+                    You can build these right now!
+                </button>
+            </h2>
+            <div id="collapseExactMatches" class="accordion-collapse collapse" aria-labelledby="headingExactMatches" data-bs-parent="#modelsAccordion">
+                <div class="accordion-body">
+                    {% for identifier in exact_match %}
+                        {% if identifier %}
+                            <div class="bg-dark m-2 py-2 text-light rounded d-flex flex-row justify-content-between align-items-center border-end {% if identifier.difficulty_score <= 0.142 %} border-success {% elif identifier.difficulty_score > 0.142 and identifier.difficulty_score <= 0.177 %} border-warning {% elif identifier.difficulty_score > 0.177 %} border-danger {% endif %} border-5">
+                                <div class="px-4">
+                                    <p class="m-2">{{ identifier.model_name }}</p>
+                                    <p class="m-2">Scale: {{ identifier.scale }}</p>
+                                </div>
+                                <div class="px-4">
+                                    <p class="m-2"><a href="{{ identifier.model_page_link }}" class="text-light p-2">Click here to visit the model page</a></p>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    {% if exact_match|length == 0 %}
+                    <p>Sorry, there are no models you can build with the paints you have</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Missing One Paint Accordion Item -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingMissingOne">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMissingOne" aria-expanded="false" aria-controls="collapseMissingOne">
+                    Missing 1 paint
+                </button>
+            </h2>
+            <div id="collapseMissingOne" class="accordion-collapse collapse" aria-labelledby="headingMissingOne" data-bs-parent="#modelsAccordion">
+                <div class="accordion-body">
+                    {% for identifier in missing_one %}
+                        {% if identifier %}
+                                <div class="bg-dark m-2 py-2 text-light rounded d-flex flex-row justify-content-between align-items-center border-end {% if identifier.difficulty_score <= 0.142 %} border-success {% elif identifier.difficulty_score > 0.142 and identifier.difficulty_score <= 0.177 %} border-warning {% elif identifier.difficulty_score > 0.177 %} border-danger {% endif %} border-5">
+                                <div class="px-4">
+                                    <p class="m-2">{{ identifier.model_name }}</p>
+                                    <p class="m-2">Scale: {{ identifier.scale }}</p>
+                                </div>
+                                <div class="px-4">
+                                    <p class="m-2"><a href="{{ identifier.model_page_link }}" class="text-light p-2">Click here to visit the model page</a></p>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    {% if missing_one|length == 0 %}
+                    <p>Sorry, there are no models where you are only missing one paint</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Missing Two Paints Accordion Item -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingMissingTwo">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMissingTwo" aria-expanded="false" aria-controls="collapseMissingTwo">
+                    Missing 2 paints
+                </button>
+            </h2>
+            <div id="collapseMissingTwo" class="accordion-collapse collapse" aria-labelledby="headingMissingTwo" data-bs-parent="#modelsAccordion">
+                <div class="accordion-body">
+                    {% for identifier in missing_two %}
+                        {% if identifier %}
+                                <div class="bg-dark m-2 py-2 text-light rounded d-flex flex-row justify-content-between align-items-center border-end {% if identifier.difficulty_score <= 0.142 %} border-success {% elif identifier.difficulty_score > 0.142 and identifier.difficulty_score <= 0.177 %} border-warning {% elif identifier.difficulty_score > 0.177 %} border-danger {% endif %} border-5">
+                                <div class="px-4">
+                                    <p class="m-2">{{ identifier.model_name }}</p>
+                                    <p class="m-2">Scale: {{ identifier.scale }}</p>
+                                </div>
+                                <div class="px-4">
+                                    <p class="m-2"><a href="{{ identifier.model_page_link }}" class="text-light p-2">Click here to visit the model page</a></p>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    {% if missing_two|length == 0 %}
+                    <p>Sorry, there are no models where you are only missing two paints</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Missing Three Paints Accordion Item -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingMissingThree">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMissingThree" aria-expanded="false" aria-controls="collapseMissingThree">
+                    Missing 3 paints
+                </button>
+            </h2>
+            <div id="collapseMissingThree" class="accordion-collapse collapse" aria-labelledby="headingMissingThree" data-bs-parent="#modelsAccordion">
+                <div class="accordion-body">
+                    {% for identifier in missing_three %}
+                        {% if identifier %}
+                                <div class="bg-dark m-2 py-2 text-light rounded d-flex flex-row justify-content-between align-items-center border-end {% if identifier.difficulty_score <= 0.142 %} border-success {% elif identifier.difficulty_score > 0.142 and identifier.difficulty_score <= 0.177 %} border-warning {% elif identifier.difficulty_score > 0.177 %} border-danger {% endif %} border-5">
+                                <div class="px-4">
+                                    <p class="m-2">{{ identifier.model_name }}</p>
+                                    <p class="m-2">Scale: {{ identifier.scale }}</p>
+                                </div>
+                                <div class="px-4">
+                                    <p class="m-2"><a href="{{ identifier.model_page_link }}" class="text-light p-2">Click here to visit the model page</a></p>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    {% if missing_three|length == 0 %}
+                    <p>Sorry, there are no models where you are only missing three paints</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Missing More accordian item -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingMissingMore">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMissingMore" aria-expanded="false" aria-controls="collapseMissingMore">
+                    You are missing more than 3 paints
+                </button>
+            </h2>
+            <div id="collapseMissingMore" class="accordion-collapse collapse" aria-labelledby="headingMissingMore" data-bs-parent="#modelsAccordion">
+                <div class="accordion-body">
+                    {% for identifier in missing_more %}
+                        {% if identifier %}
+                                <div class="bg-dark m-2 py-2 text-light rounded d-flex flex-row justify-content-between align-items-center border-end {% if identifier.difficulty_score <= 0.142 %} border-success {% elif identifier.difficulty_score > 0.142 and identifier.difficulty_score <= 0.177 %} border-warning {% elif identifier.difficulty_score > 0.177 %} border-danger {% endif %} border-5">
+                                <div class="px-4">
+                                    <p class="m-2">{{ identifier.model_name }}</p>
+                                    <p class="m-2">Scale: {{ identifier.scale }}</p>
+                                </div>
+                                <div class="px-4">
+                                    <p class="m-2"><a href="{{ identifier.model_page_link }}" class="text-light p-2">Click here to visit the model page</a></p>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <!-- End of Accordion Component -->
+
+</div>
+
+{% endblock %}

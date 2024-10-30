@@ -1,0 +1,13 @@
+/kits/tamiya-35070-m3a2-half-track--130064 easy
+/kits/tamiya-mt126-tiger-i--441138 easy
+/kits/tamiya-14020-suzuki-gsx750-police-bike--122923 medium
+/kits/tamiya-14001-yamaha-yzr500-grand-prix-racer--129730 medium
+/kits/tamiya-35102-20mm-flak38-mit-sdah51--1112074 easy
+/kits/tamiya-89596-porsche-911-gt3-metal-plated-body--1451485 medium
+/kits/tamiya-12033-renault-re-20-turbo--1412406 hard
+/kits/tamiya-12037-lotus-type-78--1467190 hard
+/kits/tamiya-12018-brabham-martini-bt44b--122733 hard
+/kits/tamiya-32555-crusader-mkiii--105909 medium
+/kits/tamiya-61062-havilland-mosquito-fb-mkvi-nf-mkii--106379 hard
+/kits/tamiya-78025-japanese-battleship-yamato--171066 hard
+/kits/tamiya-24137-alfa-romeo-155-v6-ti-dekra--114647 hard

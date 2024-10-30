@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+
+{% block body_class %}single-dark-background{% endblock %}
+
+{% set limited_nav = True %}
+
+{% block content %}
+
+<h1 class="text-light">{{ username }}</h1>
+<h1 class="text-light">{{ email }}</h1>
+<h1 class="text-light">{{ password }}</h1>
+<h1 class="text-light">{{ profile_pic_filename }}</h1>
+
+{% endblock %}

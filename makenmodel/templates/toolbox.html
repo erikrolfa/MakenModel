@@ -1,0 +1,128 @@
+<!-- Toolbox.html -->
+
+{% extends 'base.html' %}
+
+{% set full_nav = True %}
+
+{% block body_class %}single-dark-background{% endblock %}
+
+{% block content %}
+
+<!-- Toolbox Navigation Bar -->
+
+<div class="container text-center">
+    <h1 class="text-light">Toolbox</h1>
+    <nav class='d-flex justify-content-center mt-3' aria-label="...">
+        <ul class="pagination">
+            <li class="page-item"><a href="{{ url_for('show_add_paints') }}" class="page-link px-5 text-dark">Add Paints</a></li>
+            <li class="page-item active"><a href="{{ url_for('show_toolbox') }}" class="page-link px-5 text-dark">Overview</a></li>
+            <li class="page-item"><a href="{{ url_for('show_your_paints') }}" class="page-link px-5 text-dark">Your Paints</a></li>
+        </ul>
+    </nav>
+</div>
+
+
+<!-- Overview tab -->
+
+<div class="container px-4 text-center bg-white rounded">
+    <div class="p-3">
+        <div class="bg-dark rounded">
+            <h3 class="text-light p-2">Paints</h3>
+        </div>
+    </div>
+    <div class="row gx-4 pb-3">
+        <div class="col">
+         <div class="p-3 bg-dark rounded">
+            <p class="text-light">You have</p>
+            <h2 class="text-warning">{{ num_paints }}</h2>
+            <p class="text-light">paints in your collection</p>
+         </div>
+        </div>
+        <div class="col">
+            <div class="p-3 bg-dark rounded">
+                <h4 class="text-warning">Paints running low:</h4>
+                {% if paints_needing_restock %}
+                    {% for paint in paints_needing_restock %}
+                    {% if loop.index <= 4 %}
+                        <p class="text-light">{{ paint.brand }} <span class="text-warning">{{ paint.paint_code }}</span> {{ paint.paint_name }} ({{ paint.paint_type }}) <button class="btn btn-danger btn-sm remove_paint" data-paint-code ={{ paint.paint_code }} data-paint-brand="{{ paint.brand }}">Remove</button></p>
+                    {% endif %}
+                    {% endfor %}
+                    {% if paints_needing_restock|length > 4 %}
+                    <a href="{{ url_for('show_getting_low') }}" class="btn btn-warning mt-3">View All</a>
+                    {% endif %}
+                {% else %}
+                    <p class="text-light">You have no paints running low!</p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col">
+          <div class="p-3 bg-dark rounded">
+              <h2 class="text-light">Wishlist</h2>
+          </div>
+        </div>
+    </div>
+    <div class="p-3">
+        <div class="bg-dark rounded">
+            <h3 class="text-light p-2">Brands</h3>
+        </div>
+    </div>
+    <div class="row gx-4 pb-3">
+        <div class="col">
+         <div class="p-3 bg-dark rounded">
+            <p class="text-light">You have paints from</p>
+            <h2 class="text-warning">{{ num_brands }}</h2>
+            <p class="text-light">{% if num_brands > 1 or num_brands == 0%}brands{% else %}brand{% endif %} in your collection</p>
+         </div>
+        </div>
+        <div class="col">
+          <div class="p-3 bg-dark rounded">
+            <h2 class="text-light">Favorite Brands</h2>
+                {% if favorite_brands %}
+                <ul>
+                    {% for brand_info in favorite_brands %}
+                        <li class="text-light">{{ brand_info.brand }} - {{ brand_info.paint_count }} paints</li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                    <p>No favorite brand. Start adding paints to see your favorite brand here!</p>
+                {% endif %}
+          </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block custom_scripts %}
+<script>
+    $(document).ready(function() {
+        $('.remove_paint').click(function() {
+            // Get paint data
+            var brand = $(this).data('paint-brand');
+            var paintCode = $(this).data('paint-code');
+
+            // Make POST request
+            $.ajax({
+                url: '/toolbox/remove_from_getting_low',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                'paint-brand': brand,
+                'paint-code': paintCode
+                }),
+                success: function(response) {
+                    // Handle success
+                    console.log('POST request successful');
+                    window.location.reload();
+                },
+                error: function(xhr, status, error) {
+                    // Handle error
+                    console.error('Error:', error);
+                }
+            });
+        });
+    });
+    </script>
+
+
+{% endblock %}

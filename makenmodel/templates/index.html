@@ -1,0 +1,138 @@
+<!-- Index.html -->
+
+{% extends "base.html" %}
+
+{% set full_nav = True %}
+
+{% block content %}
+    <!-- Showcase -->
+
+    <section class="bg-dark text-light p-5 text-center text-sm-start">
+        <div class="container">
+            <div class="d-sm-flex">
+                <div>
+                    <h1>A Model Maker's <span class="text-warning">Personal Assistant</span></h1>
+                    <p class="lead my-4">Welcome to Make n' Model! Here you can keep track of your modeling paints and tools, and filter to find models that only use the tools you have!</p>
+                </div>
+                <img class="img-fluid w-50 d-none d-sm-block" src="{{ url_for('static', filename='images/mustang-img.png') }}" alt="mustang-img">
+            </div>
+            {% if not logname %}
+                <a href="{{ url_for('show_create_account') }}" class="btn btn-warning">Create Account</a>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Cards for Inventory and Model Search -->
+    <section class="p-5">
+        <div class="container">
+            <div class="row row-cols-1 row-cols-md-2 g-4">
+                <div class="col">
+                    <div class="card h-100 bg-dark text-light">
+                        <div class="card-body text-center d-flex flex-column">
+                            <div class="h1 mb-3">
+                                <i class="bi-tools"></i>
+                            </div>
+                            <h3 class="card-title mb-3">Add Tools</h3>
+                            <p class="card-text">
+                                Add paint and tools to your personal toolbox. We will use this to filter and recommend models for you based on the tools you own!
+                            </p>
+                            <a id='add_tools_button' href="{{ url_for('show_toolbox') }}" data-logged-in="{% if logname %}True{% else %}False{% endif %}" class="btn btn-primary mt-auto">Add Tools</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100 bg-dark text-light">
+                        <div class="card-body text-center d-flex flex-column">
+                            <div class="h1 mb-3">
+                                <i class="bi-search"></i>
+                            </div>
+                            <h3 class="card-title mb-3">
+                                Find Models
+                            </h3>
+                            <p class="card-text">
+                                Search for models based on the paints and tools in your personal collection
+                            </p>
+                            <!-- TODO: Fix link -->
+                            <a id='find_models_button' href="#Find_models" data-logged-in="{% if logname %}True{% else %}False{% endif %}" class="btn btn-primary mt-auto">Find Models</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Alert for user not logged in trying to click buttons -->
+
+    <!-- Modal -->
+    <div class="modal fade" id="loginModal" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loginModalLabel">Login Required</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <p>Please log in to access this feature</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <a href="{{ url_for('show_login') }}" class="btn btn-warning">Login</a>
+                    <!-- Add login button or link here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block custom_scripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const addTools = document.querySelector('#add_tools_button');
+            const tools_nav = document.querySelector('#tools_nav_button');
+            const addModels = document.querySelector('#find_models_button');
+            const models_nav = document.querySelector('#models_nav_button');
+            const loginAlert = new bootstrap.Modal(document.getElementById('loginModal'))
+
+            addTools.addEventListener('click', function (event) {
+
+                const loggedIn = addTools.getAttribute('data-logged-in');
+
+                if (loggedIn == 'False') {
+                    event.preventDefault();
+                    loginAlert.show();
+                }
+            });
+
+            tools_nav.addEventListener('click', function (event) {
+
+                const loggedIn = tools_nav.getAttribute('data-logged-in');
+
+                if (loggedIn == 'False') {
+                    event.preventDefault();
+                    loginAlert.show();
+                }
+            });
+
+            addModels.addEventListener('click', function (event) {
+
+                const loggedIn = addModels.getAttribute('data-logged-in');
+
+                if (loggedIn == 'False') {
+                    event.preventDefault();
+                    loginAlert.show();
+                }
+            });
+
+            models_nav.addEventListener('click', function (event) {
+
+                const loggedIn = models_nav.getAttribute('data-logged-in');
+
+                if (loggedIn == 'False') {
+                    event.preventDefault();
+                    loginAlert.show();
+                }
+            });
+        });
+    </script>
+{% endblock %}

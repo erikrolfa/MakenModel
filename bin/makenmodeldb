@@ -1,0 +1,105 @@
+#!/bin/bash
+# makenmodeldb
+
+# Stop on errors
+# See https://vaneyckt.io/posts/safer_bash_scripts_with_set_euxo_pipefail/
+set -Eeuo pipefail
+
+# Sanity check command line options
+usage() {
+  echo "Usage: $0 (create|destroy|reset|dump)"
+}
+
+if [ $# -ne 1 ]; then
+  usage
+  exit 1
+fi
+
+# Parse argument.  $1 is the first argument
+case $1 in
+  "create")
+
+    if [ -e var/makenmodel.sqlite3 ]; then
+        echo "Error: database already exists"
+        exit 1
+    fi
+
+    mkdir -p var/uploads
+    echo "+ mkdir -p var/uploads"
+
+    sqlite3 var/makenmodel.sqlite3 < sql/schema.sql
+    echo "+ sqlite3 var/makenmodel.sqlite3 < sql/schema.sql"
+
+    sqlite3 var/makenmodel.sqlite3 < sql/data.sql
+    echo "+ sqlite3 var/makenmodel.sqlite3 < sql/data.sql"
+
+    cp sql/uploads/* var/uploads/
+    echo "+ cp sql/uploads/* var/uploads/"
+
+    python3 data_transfer_scripts/transfer_paints_to_database.py
+    echo "Populating database with paint information"
+
+    python3 data_transfer_scripts/instructions_to_database.py
+    echo "Populating database with instruction information"
+
+    python3 data_transfer_scripts/paints_to_instructions_map.py
+    echo "Populating instructions with their required paints"
+
+    python3 data_transfer_scripts/difficulty_to_database.py
+    echo "Populating instructions with their difficulty score"
+
+    python3 data_transfer_scripts/delete_no_difficulty_score.py
+    echo "Deleting instructions with no difficulty score"
+
+    ;;
+
+  "destroy")
+    rm -rf var/makenmodel.sqlite3 var/uploads
+    echo "+ rm -rf var/makenmodel.sqlite3 var/uploads"
+    ;;
+
+  "reset")
+    rm -rf var/makenmodel.sqlite3 var/uploads
+    echo "+ rm -rf var/makenmodel.sqlite3 var/uploads"
+
+    mkdir -p var/uploads
+    echo "+ mkdir -p var/uploads"
+
+    sqlite3 var/makenmodel.sqlite3 < sql/schema.sql
+    echo "+ sqlite3 var/makenmodel.sqlite3 < sql/schema.sql"
+
+    sqlite3 var/makenmodel.sqlite3 < sql/data.sql
+    echo "+ sqlite3 var/makenmodel.sqlite3 < sql/data.sql"
+
+    cp sql/uploads/* var/uploads/
+    echo "+ cp sql/uploads/* var/uploads/"
+
+    python3 data_transfer_scripts/transfer_paints_to_database.py
+    echo "Populating database with paint information"
+
+    python3 data_transfer_scripts/instructions_to_database.py
+    echo "Populating database with instruction information"
+
+    python3 data_transfer_scripts/paints_to_instructions_map.py
+    echo "Populating instructions with their required paints"
+
+    python3 data_transfer_scripts/difficulty_to_database.py
+    echo "Populating instructions with their difficulty score"
+
+    python3 data_transfer_scripts/delete_no_difficulty_score.py
+    echo "Deleting instructions with no difficulty score"
+    ;;
+
+  "dump")
+    echo "+ sqlite3 -batch -line var/makenmodel.sqlite3 'SELECT * FROM users'"
+    sqlite3 -batch -line var/makenmodel.sqlite3 'SELECT * FROM users'
+    echo "+ sqlite3 -batch -line var/makenmodel.sqlite3 'SELECT * FROM paints'"
+    sqlite3 -batch -line var/makenmodel.sqlite3 'SELECT * FROM paints'
+    echo "+ sqlite3 -batch -line var/makenmodel.sqlite3 'SELECT * FROM user_paints'"
+    sqlite3 -batch -line var/makenmodel.sqlite3 'SELECT * FROM user_paints'
+    ;;
+  *)
+    usage
+    exit 1
+    ;;
+esac
