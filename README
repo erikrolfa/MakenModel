@@ -1,0 +1,118 @@
+Authors:
+Carter Gracin (cgracin@umich.edu)
+Andrew Sawicki (sawickid@umich.edu)
+April Choe (aprilyc@umich.edu)
+Erik Anderson (erikrolf@umich.edu)
+Farhan Ariff Bin Halis Azhan (farharif@umich.edu)
+
+<!-- Bootstrap Docs: -->
+https://getbootstrap.com/docs/5.3/getting-started/introduction/
+
+<!-- To run flask app -->
+flask --app makenmodel --debug run --host 0.0.0.0 --port 8000
+
+
+<!-- LOGIN FOR TEST USER -->
+    username: test_user
+    password: Password1!
+
+<!-- IMPORTANT NOTES -->
+    - Most of our functions are written in a way that we run them once, and the output is written to a json or txt file because we are dealing with 20GB+ of data, and don't want to have to re-run everytime
+    - This being so, the only functions a user needs to run to get the website and our data running are as follows:
+        - Create a python virtual environment
+        $ pip install -r requirements.txt
+        $ chmod +x ./bin/makenmodeldb
+        $ ./bin/makenmodeldb create
+            - If this says the database is already created, run this instead
+            $ ./bin/makenmodeldb reset
+        $ flask --app makenmodel --debug run --host 0.0.0.0 --port 8000
+
+    - After running these, you can naviagate to localhost, use the username and password listed above and use the website
+
+
+<!-- PDF Data -->
+
+    -Here is link to the google drive containing all of our parsed json data from google cloud
+        - https://drive.google.com/drive/folders/1TmNigsRaUvDCZ5eF03HEJBtU2iUG3K-3?usp=sharing
+    -There are over 1500 parsed pdfs and the total size of all this data is 20GB+, which is why we didnt include it in our zip file
+    - data/simplifiedjson.json is an example of what one of our parsed pdfs look like
+    - All json_extracted pdfs MUST BE PLACED in a folder named json_extracted/
+
+
+<!-- PYTHON SCRAPERS EXPLANATION -->
+
+    conversion_scraper.py
+        TO RUN:
+            $ python3 Python_Scrapers/conversion_scraper.py
+
+        - This program scrapes the website: https://www.modelshade.com/paint-conversion-chart/tamiya
+        - Gathers the conversions from Tamiya Paint colors to other brands of paint
+
+    paint_scraper.py
+        TO RUN:
+            $ python3 Python_Scrapers/paint_scraper.py
+
+        - This program scrapes the website: https://www.scalemates.com/colors/?ranges=all
+        - This gathers all available paints a user could possibly have
+            - This is used to autofill suggestions when a user is adding paints to their collection
+            - Also used as a reference when a conversion needs to be made from a Tamiya Paint to a paint of another brand
+        - Scraped data is stored in JSON format
+            - File located at:
+                scraping_data/paint_scrape_data.json
+
+    pdf_scraper.py
+        TO RUN:
+            $ python3 Python_Scrapers/pdf_scraper.py [mode]
+
+        - This program scapes the website: https://www.scalemates.com/search.php?q=tamiya&fkSECTION[]=Kits&fkCOMPNAME[]=%22Tamiya%22&fkTYPENAME[]=%22Full%20kits%22&fkGROUPS[]=%22Ships%22&fkGROUPS[]=%22Aircraft%22&fkGROUPS[]=%22Vehicles%22&fkGROUPS[]=%22Space%22&fkGROUPS[]=%22Trains%22
+            - Filters:
+                Brand: Tamiya
+                Product Type: Full kits
+                Groups: Ships, Aircraft, Vehicles, Space, Trains
+        - Available modes to run the program:
+            -u: (run before other modes) Scrapes scalemates page to retrieve links to relevant models
+            -p: Get instruction pdf links, if available, from model pages
+            -s: Get model scale specifications from model pages
+            -t: Download processed JSON files from Google Cloud Storage
+                - Extracting text from PDFs done with Document AI and the extracted JSONs are stored in Google Cloud Storage
+        - Output Files:
+            -u: model_page_links.output
+            -p: pdf_links.output
+            -s: model_specs.output
+            -t: json_extracted/*
+
+    pdf_analyzer.py
+        TO RUN:
+            $ python3 Python_Scrapers/pdf_analyzer.py
+
+        - This program runs all of our algorithms, part and paint extraction, tokenization, naive_bayes, difficulty calculations, and outputs the pdf_name and calculated difficulty score for that pdf to a file called difficulty_scores.output.
+        - ONLY run this if you have all json_extracted pdfs downloaded in your directory
+        - Output file must be named difficulty_scores.output and be placed in the data/ folder
+
+    transfer_paints_to_database.py
+        TO RUN:
+            $ python3 Python_Scrapers/transfer_paints_to_database.py
+
+        - This program transfers all the scraped information gathered from paint_scraper.py to our sqlite3 database
+        - This allows us to access the data in a quick way using SQL queries instead of parsing a 10,000 line JSON file
+        - AUTOMATICALLY RAN by ./bin/makenmodeldb create and ./bin/makenmodeldb reset
+            - If you don't use this script to create or reset the database, you will need to run this program independently
+
+
+<!-- langtest.py -->
+
+    - This is used to filter out words from the pdf that are not english
+
+
+
+<!-- DATA folder -->
+
+    This folder holds all of the extraneous data that we need/use in our program
+
+    - golden_standard.txt
+        - This file is our golden_standard for training and testing the accuracy of our instruction classifier algorithm
+
+    - scale_rating.txt
+        - Models come in several scales, and typically the larger the model, the more difficult it is
+        - This file maps common scale sizes to a value between 0-1 based on how much we interpret the scale to impact the difficulty of the model
+        - In the instance where the model we are analyzing doesn't have a corresponding scale value, we will use a default value of 0.5 in our algorithm
